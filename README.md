@@ -8,54 +8,23 @@ MathWeaver 是面向数学教材的桌面知识工作台：把 PDF 转换为 Mar
 
 ### 1. 下载桌面程序
 
-请从固定版本 `v0.1.1` 的 Release 下载以下两个文件：
+请从固定版本 `v0.1.1` 的 Release 下载桌面程序：
 
 - [MathWeaver-0.1.1-windows-x64.zip](https://github.com/SJTU-AI4MATH/MathWeaver/releases/download/v0.1.1/MathWeaver-0.1.1-windows-x64.zip)：完整 Windows 桌面程序。
-- [SHA256SUMS.txt](https://github.com/SJTU-AI4MATH/MathWeaver/releases/download/v0.1.1/SHA256SUMS.txt)：发布文件的完整性校验清单。
 
 也可以先打开 [v0.1.1 Release 页面](https://github.com/SJTU-AI4MATH/MathWeaver/releases/tag/v0.1.1) 查看发布说明和全部资产。
 
 请不要手动下载 OCR 的 29 个分片。首次处理 PDF 时，应用会从公开 Release 自动下载并安装 OCR 组件。
 
-### 2. 用 `SHA256SUMS.txt` 校验下载文件
-
-`SHA256SUMS.txt` 记录了 Release 中各文件的 SHA-256 摘要。它的作用是确认下载的 ZIP 没有损坏，也没有在下载过程中被意外替换。它不是安装文件，不需要放进解压后的程序目录。
-
-在包含两个下载文件的目录中打开 PowerShell，运行下面的命令：
-
-```powershell
-$zip = Join-Path (Get-Location) "MathWeaver-0.1.1-windows-x64.zip"
-$record = Select-String -LiteralPath ".\SHA256SUMS.txt" `
-    -Pattern ([regex]::Escape((Split-Path -Leaf $zip))) |
-    Select-Object -First 1
-
-if (-not $record) {
-    throw "SHA256SUMS.txt 中没有找到 ZIP 的校验记录。"
-}
-
-$expected = ($record.Line -split '\s+', 2)[0].ToLowerInvariant()
-$actual = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
-
-if ($actual -ne $expected) {
-    throw "校验失败：请删除当前 ZIP 后重新下载。"
-}
-
-Write-Host "校验通过，可以解压并运行 MathWeaver。"
-```
-
-只有显示“校验通过”后才应继续使用该 ZIP。如果校验失败，请删除 ZIP 和不完整的下载副本后重新下载；不要使用校验不一致的程序。
-
-校验完成后可以保留 `SHA256SUMS.txt` 供日后复核，也可以删除它，不会影响 MathWeaver 的安装、启动或 OCR 运行。若需要再次确认文件完整性，请保留它。
-
-### 3. 完整解压并启动
+### 2. 完整解压并启动
 
 1. 将 ZIP 解压到一个有写入权限的本地目录。
 2. 保留解压目录中的全部文件，尤其是 `win-unpacked` 下的 DLL、`resources` 和其他运行时文件。
 3. 从完整解压目录运行 `MathWeaver.exe`，不要把 EXE 单独复制到其他位置。
 
-当前版本未进行代码签名，Windows SmartScreen 可能显示警告。请先确认下载地址和 SHA-256 校验结果；如果组织安全策略不允许运行未签名程序，请等待签名版本或联系管理员。
+当前版本未进行代码签名，Windows SmartScreen 可能显示警告。请确认下载地址来自本仓库；如果组织安全策略不允许运行未签名程序，请等待签名版本或联系管理员。
 
-### 4. 首次安装 OCR
+### 3. 首次安装 OCR
 
 第一次处理 PDF 时，应用会提示安装本地 OCR 组件：
 
@@ -67,7 +36,7 @@ Write-Host "校验通过，可以解压并运行 MathWeaver。"
 
 OCR 组件已经包含在桌面程序支持的发布流程中，不要求新手预先安装 Python、`uv` 或 MinerU。
 
-### 5. 处理 PDF
+### 4. 处理 PDF
 
 完成 OCR 安装后，在应用中选择 PDF 并开始处理。基本流程是：
 
@@ -143,7 +112,7 @@ Release 还提供以下可供复核或开发者使用的文件：
 - [`models-manifest.json`](https://github.com/SJTU-AI4MATH/MathWeaver/releases/download/v0.1.1/models-manifest.json)：随 OCR 发布的模型清单。
 - [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) 与 [`licenses/`](licenses/)：第三方组件说明和许可证文本。
 
-普通用户只需要下载桌面 ZIP 和 `SHA256SUMS.txt`；不需要单独处理 OCR 分片、模型分片或 SBOM 文件。
+普通用户只需要下载桌面 ZIP；不需要单独处理 OCR 分片、模型分片或 SBOM 文件。
 
 ## 常见问题
 
@@ -157,15 +126,11 @@ Release 还提供以下可供复核或开发者使用的文件：
 
 ### Windows 显示 SmartScreen 警告
 
-这是因为当前研究预览版未进行代码签名。请先核对 Release 地址和 SHA-256；如果单位策略禁止未签名程序，请不要绕过策略。
+这是因为当前研究预览版未进行代码签名。请先核对 Release 地址；如果单位策略禁止未签名程序，请不要绕过策略。
 
 ### 只打开 EXE 后启动失败
 
 请重新下载并完整解压 ZIP，从解压目录运行 `MathWeaver.exe`。不要只复制 EXE，也不要删除 `resources` 或 DLL 文件。
-
-### SHA-256 校验失败
-
-删除当前 ZIP 和不完整的下载副本，重新从 [v0.1.1 Release](https://github.com/SJTU-AI4MATH/MathWeaver/releases/tag/v0.1.1) 下载。不要运行校验值不一致的文件。
 
 ### OCR 成功但知识图谱没有生成
 
